@@ -7,7 +7,9 @@ pipeline {
    stages {
        stage('Build') {
            agent {
-              agent { node { label 'jenkins-slave' } }
+              node { 
+                 label 'jenkins-slave' 
+                   }
                //docker {
                //    image 'jenkins-slave'
                //}

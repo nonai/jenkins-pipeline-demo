@@ -66,7 +66,6 @@ spec:
                registryCredential = 'docker-hub'
            }
            steps{
-             container('slave-with-helm'){
                script {
                    def appimage = docker.build registry + ":$BUILD_NUMBER"
                    docker.withRegistry( '', registryCredential ) {
@@ -77,14 +76,17 @@ spec:
                }
            }
        }
-       }
        stage ('Deploy') {
+         container('slave-with-helm'){
            steps {
                script{
                    def image_id = registry + ":$BUILD_NUMBER"
                    sh "echo IMAGE ID ready for deployment: \"${image_id}\""
+                   sh "helm init --client-only"
+                   sh "helm list"
                }
            }
        }
+     }
    }
 }

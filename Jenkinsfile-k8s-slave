@@ -77,8 +77,8 @@ spec:
            }
        }
        stage ('Deploy') {
-         container('slave-with-helm'){
            steps {
+             container('slave-with-helm'){
                script{
                    def image_id = registry + ":$BUILD_NUMBER"
                    sh "echo IMAGE ID ready for deployment: \"${image_id}\""

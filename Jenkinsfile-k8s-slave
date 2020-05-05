@@ -1,5 +1,10 @@
 pipeline {
-   agent any
+   //agent any
+   agent {
+         kubernetes {
+           yamlFile 'KubernetesPod.yaml'
+         }
+   }
    environment {
        registry = "nonai/repo1"
        GOCACHE = "/tmp"
@@ -61,14 +66,17 @@ spec:
                registryCredential = 'docker-hub'
            }
            steps{
+             container('slave-with-helm'){
                script {
                    def appimage = docker.build registry + ":$BUILD_NUMBER"
                    docker.withRegistry( '', registryCredential ) {
                        appimage.push()
                        appimage.push('latest')
                    }
+                   sh "helm init --client-only"
                }
            }
+       }
        }
        stage ('Deploy') {
            steps {

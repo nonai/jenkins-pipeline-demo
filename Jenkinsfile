@@ -7,9 +7,10 @@ pipeline {
    stages {
        stage('Build') {
            agent {
-               docker {
-                   image 'jenkins-slave'
-               }
+              agent { node { label 'jenkins-slave' } }
+               //docker {
+               //    image 'jenkins-slave'
+               //}
            }
            steps {
                // Create our project directory.

@@ -27,25 +27,25 @@ pipeline {
            }
        }
        stage('Test') {
-           agent {
-             kubernetes {
-                     yaml """
-apiVersion: v1
-kind: Pod
-namespace: jenkins
-metadata:
-  labels:
-    some-label: jenkins-slave-pod
-spec:
-  containers:
-  - name: golang
-    image: golang
-    command:
-    - cat
-    tty: true
-"""
-}
-           }
+//           agent {
+//             kubernetes {
+//                     yaml """
+//apiVersion: v1
+//kind: Pod
+//namespace: jenkins
+//metadata:
+//  labels:
+//    some-label: jenkins-slave-pod
+//spec:
+//  containers:
+//  - name: golang
+//    image: golang
+//    command:
+//    - cat
+//    tty: true
+//"""
+//}
+//           }
            steps {
                // Create our project directory.
                container('golang'){

@@ -11,3 +11,13 @@ spec:
     command:
     - cat
     tty: true
+  - name: golang
+    image: golang:1.14.2-alpine3.11
+    command:
+    - cat
+    tty: true
+  - name: docker
+    image: docker:19.03
+    command:
+    - cat
+    tty: true

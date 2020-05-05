@@ -44,6 +44,7 @@ pipeline {
                registryCredential = 'docker-hub'
            }
            steps{
+             container('docker'){
                script {
                    def appimage = docker.build registry + ":$BUILD_NUMBER"
                    docker.withRegistry( '', registryCredential ) {
@@ -52,6 +53,7 @@ pipeline {
                    }
                }
            }
+         }
        }
        stage ('Deploy') {
            steps {

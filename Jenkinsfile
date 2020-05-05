@@ -7,8 +7,26 @@ pipeline {
    stages {
        stage('Build') {
            agent {
-              minikube { 
-                 label 'jenkins-slave' 
+              kubernetes { 
+                 yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: some-label-value
+spec:
+  containers:
+  - name: maven
+    image: maven:alpine
+    command:
+    - cat
+    tty: true
+  - name: busybox
+    image: busybox
+    command:
+    - cat
+    tty: true
+"""
                    }
                //docker {
                //    image 'jenkins-slave'

@@ -69,7 +69,6 @@ pipeline {
              container('docker'){
                script {
                    sh "which docker"
-                   sh "docker ps"
                    def appimage = docker.build registry + ":$BUILD_NUMBER"
                    docker.withRegistry( '', registryCredential ) {
                        appimage.push()

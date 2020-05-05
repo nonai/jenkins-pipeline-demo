@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+namespace: jenkins
+metadata:
+  labels:
+    some-label: slave-with-helm
+spec:
+  containers:
+  - name: slave-with-helm
+    image: alpine/helm:2.14.0
+    command:
+    - cat
+    tty: true

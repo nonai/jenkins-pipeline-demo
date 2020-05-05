@@ -3,7 +3,7 @@ kind: Pod
 namespace: jenkins
 metadata:
   labels:
-    some-label: slave-with-helm
+    some-label: jenkins-slave
 spec:
   containers:
   - name: slave-with-helm

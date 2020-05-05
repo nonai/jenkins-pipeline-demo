@@ -1,6 +1,7 @@
 pipeline {
    agent any
    environment {
+       registry = "nonai/repo1"
        GOCACHE = "/tmp"
    }
    stages {

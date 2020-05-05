@@ -67,12 +67,13 @@ pipeline {
            }
            steps{
                script {
+                   sh "helm init --client-only"
+                   sh "docker ps"
                    def appimage = docker.build registry + ":$BUILD_NUMBER"
                    docker.withRegistry( '', registryCredential ) {
                        appimage.push()
                        appimage.push('latest')
                    }
-                   sh "helm init --client-only"
                }
            }
        }

@@ -7,7 +7,7 @@ pipeline {
    stages {
        stage('Build') {
            agent {
-              node { 
+              kubernetes { 
                  label 'jenkins-slave' 
                    }
                //docker {

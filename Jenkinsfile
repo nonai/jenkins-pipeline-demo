@@ -6,13 +6,17 @@ pipeline {
    }
    stages {
        stage('Build') {
-           agent {
-               docker {
-                   image 'golang'
-               }
-           }
+         //  agent {
+         //      docker {
+         //          image 'golang'
+         //      }
+         //  }
            steps {
                // Create our project directory.
+               sh 'whoami'
+               sh 'echo $PATH'
+               sh 'which docker'
+               sh 'ls -l /Users/nandan/Library/Containers/com.docker.docker/Data/docker.sock'
                sh 'cd ${GOPATH}/src'
                sh 'mkdir -p ${GOPATH}/src/hello-world'
                // Copy all files in our Jenkins workspace to our project directory.

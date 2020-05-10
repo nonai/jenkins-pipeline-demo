@@ -19,7 +19,7 @@ pipeline {
                sh 'cd test'
                sh 'go clean -cache'
                // Run Unit Tests.
-               sh 'cd test; pwd; go test . -v -short'
+               sh 'cd test; pwd; go test minimal_pod_integration_test.go -v -short'
            }
        }
    }

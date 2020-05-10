@@ -10,7 +10,7 @@ pipeline {
                git changelog: false, poll: false, url: 'https://github.com/gruntwork-io/terratest-helm-testing-example.git'
                sh 'pwd'
                sh 'ls -la'
-               sh 'which go'
+               sh 'echo $PATH'
            }
        }
        stage('Test') {

@@ -18,7 +18,7 @@ pipeline {
                sh 'cd test'
                sh 'go clean -cache'
                // Run Unit Tests.
-               sh 'go test . -v -short'
+               sh 'pwd; go test . -v -short'
            }
        }
    }

@@ -8,6 +8,7 @@ pipeline {
            steps {
                // Create our project directory.
                git changelog: false, poll: false, url: 'https://github.com/gruntwork-io/terratest-helm-testing-example.git'
+               sh 'cd test'
                sh 'pwd'
                sh 'ls -la'
                sh 'echo $PATH'
@@ -18,7 +19,7 @@ pipeline {
                sh 'cd test'
                sh 'go clean -cache'
                // Run Unit Tests.
-               sh 'pwd; go test . -v -short'
+               sh 'cd test; pwd; go test . -v -short'
            }
        }
    }

@@ -3,10 +3,18 @@ pipeline {
    environment {
        GOCACHE = "/tmp"
    }
+   parameters {
+       booleanParam(defaultValue: false, description: 'Test K8s with Terratest Helm plugin?', name: 'TWTP')
+       booleanParam(defaultValue: false, description: 'Test K8s with Sonobuoy plugin(minimal)?', name: 'TWSP')
+       booleanParam(defaultValue: false, description: 'Check for expected Pods to be healthy?', name: 'CHECKPODS')
+   }
    stages {
        stage('Unit tests') {
            parallel {
                stage('test-with-terratest-plugin') {
+                   when {
+                     expression { env.TWTP == "true" }
+                   }
                    steps {
                      git changelog: false, poll: false, url: 'https://github.com/gruntwork-io/terratest-helm-testing-example.git'
                      sh 'pwd'
@@ -14,25 +22,32 @@ pipeline {
                      sh 'cd test; pwd; go test minimal_pod_integration_test.go -v -short'
                    }
                }
-               stage('test-with-sonobuoy-plugin') {
-                   steps {
-                     sh 'sonobuoy delete --wait;sonobuoy run --wait --mode quick; results=$(sonobuoy retrieve);sonobuoy results $results'
-                   }
-               }
                stage('check-for-existing-pods-health') {
+                   when {
+                     expression { env.CHECKPODS == "true" }
+                   }
                    steps {
                      sh '''
-                      k8sPodChecker=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l)
+                      k8sPodChecker=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l);
                       if [[ ${k8sPodChecker} -gt 0 ]];
                       then
                         echo "[FAILURE] The Cluster contain errored pods. Please check"
                         exit ${k8sPodChecker}
                       else
                         echo "[SUCCESS] The cluster has no errored pods."
+                      fi
                       '''
                    }
                }
        }
-   }
-}
+       stage('test-with-sonobuoy-plugin') {
+                   when {
+                     expression { env.TWSP == "true" }
+                   }
+                   steps {
+                     sh 'sonobuoy delete --wait;sonobuoy run --wait --mode quick; results=$(sonobuoy retrieve);sonobuoy results $results'
+                   }
+               }
+    }
+  }
 }

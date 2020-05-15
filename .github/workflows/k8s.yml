@@ -1,0 +1,14 @@
+- name: Kubernetes toolset
+  uses: stefanprodan/kube-tools@v1.4.0
+  with:
+    # command to run
+    command: 
+      kubectl version
+    kubectl: # optional
+    # kustomize version
+    kustomize: # optional
+    # helm version
+    helm: # optional
+    # helm version
+    helmv3: # optional
+      

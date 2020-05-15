@@ -1,0 +1,29 @@
+pipeline {
+   agent any
+   environment {
+       GOCACHE = "/tmp"
+   }
+   stages {
+       stage('Unit tests') {
+           parallel {
+               stage('test-with-terratest-plugin') {
+                   git changelog: false, poll: false, url: 'https://github.com/gruntwork-io/terratest-helm-testing-example.git'
+                   sh 'pwd'
+                   sh 'echo $PATH'
+                   sh 'cd test; pwd; go test minimal_pod_integration_test.go -v -short'
+               }
+               stage('test-with-sonobuoy-plugin') {
+                   sh 'sonobuoy delete --wait;sonobuoy run --wait --mode quick; results=$(sonobuoy retrieve);sonobuoy results $results'
+               }
+               stage('check-for-existing-pods-health') {
+                   sh '''
+                     k8s-query=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l)
+                     if [[ ${k8s-query} -gt 0 ]];
+                     then
+                       echo "[FAILURE] The Cluster contain errored pods. Please check"
+                       exit ${k8s-query}
+               }
+       }
+   }
+}
+}

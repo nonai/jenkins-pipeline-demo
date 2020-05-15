@@ -1,14 +1,16 @@
-- name: Kubernetes toolset
-  uses: stefanprodan/kube-tools@v1.4.0
-  with:
-    # command to run
-    command: 
-      kubectl version
-    kubectl: # optional
-    # kustomize version
-    kustomize: # optional
-    # helm version
-    helm: # optional
-    # helm version
-    helmv3: # optional
-      
+name: K8s check
+
+on: [pull_request, issues]
+
+jobs:
+  deploy:
+    name: Check the K8s Cluster
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: deploy to cluster
+      uses: steebchen/kubectl@master
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: get pods --all-namespaces | grep -v Running

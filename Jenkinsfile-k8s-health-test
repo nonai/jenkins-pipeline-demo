@@ -17,11 +17,14 @@ pipeline {
                }
                stage('check-for-existing-pods-health') {
                    sh '''
-                     k8s-query=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l)
-                     if [[ ${k8s-query} -gt 0 ]];
-                     then
-                       echo "[FAILURE] The Cluster contain errored pods. Please check"
-                       exit ${k8s-query}
+                    k8s-query=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l)
+                    if [[ ${k8s-query} -gt 0 ]];
+                    then
+                      echo "[FAILURE] The Cluster contain errored pods. Please check"
+                      exit ${k8s-query}
+                    else
+                      echo "[SUCCESS] The cluster has no errored pods.
+                    '''
                }
        }
    }

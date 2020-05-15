@@ -44,8 +44,24 @@ pipeline {
                      expression { env.TWSP == "true" }
                    }
                    steps {
-                     sh 'sonobuoy delete --wait;sonobuoy run --wait --mode quick; results=$(sonobuoy retrieve);sonobuoy results $results'
+                     sh '''
+                       sonobuoy delete --wait
+                       sonobuoy run --e2e-focus "should update pod when spec was updated and update strategy is RollingUpdate" --e2e-focus "Pods should be submitted and removed" --e2e-focus "Clean up pods on node kubelet should be able to delete 10 pods per node in 1m0s" --wait 
+                       results=$(sonobuoy retrieve);sonobuoy results $results
+                       ls -la 
+                       tar -xvzf $results
+                     '''
                    }
+                   post {
+                       always {
+                           junit '**/plugins/e2e/results/**/*.xml'
+                       }
+                   }
+                }
+            }
+            post { 
+                always { 
+                    cleanWs()
                 }
             }
         }

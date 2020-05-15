@@ -39,15 +39,15 @@ pipeline {
                       '''
                    }
                }
-       }
-       stage('test-with-sonobuoy-plugin') {
+               stage('test-with-sonobuoy-plugin') {
                    when {
                      expression { env.TWSP == "true" }
                    }
                    steps {
                      sh 'sonobuoy delete --wait;sonobuoy run --wait --mode quick; results=$(sonobuoy retrieve);sonobuoy results $results'
                    }
-               }
+                }
+            }
+        }
     }
-  }
 }

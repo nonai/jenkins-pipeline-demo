@@ -9,7 +9,20 @@ pipeline {
        booleanParam(defaultValue: false, description: 'Check for expected Pods to be healthy?', name: 'CHECKPODS')
    }
    stages {
-       stage('Unit tests') {
+       stage('Prep') {
+           steps {
+               sh 'echo "WS Cleanup"'
+           }
+           post { 
+                always { 
+                    cleanWs cleanWhenAborted: true
+                    cleanWs cleanWhenFailure: true
+                    cleanWs cleanWhenSuccess: true
+                    cleanWs deleteDirs: true
+                }
+            }
+       }
+       stage('Smoke Tests') {
            parallel {
                stage('test-with-terratest-plugin') {
                    when {
@@ -28,7 +41,8 @@ pipeline {
                    }
                    steps {
                      sh '''
-                      k8sPodChecker=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l);
+                      //k8sPodChecker=$(kubectl get pods --all-namespaces --field-selector=status.phase!=Running | grep -iv COMPLETED |  grep -iv NAMESPACE | wc -l);
+                      k8sPodChecker=$(kubectl get pods --all-namespaces  | awk '{print $4}' | egrep -v "STATUS|Running|Completed" | wc -l)
                       if [[ ${k8sPodChecker} -gt 0 ]];
                       then
                         echo "[FAILURE] The Cluster contain errored pods. Please check"
@@ -46,22 +60,42 @@ pipeline {
                    steps {
                      sh '''
                        sonobuoy delete --wait
-                       sonobuoy run --e2e-focus "should update pod when spec was updated and update strategy is RollingUpdate" --e2e-focus "Pods should be submitted and removed" --e2e-focus "Clean up pods on node kubelet should be able to delete 10 pods per node in 1m0s" --wait 
-                       results=$(sonobuoy retrieve);sonobuoy results $results
+                       sonobuoy run --e2e-focus "Clean up pods on node kubelet should be able to delete 10 pods per node in 1m0s" --wait
+                       sonobuoy status
+                       results1=$(sonobuoy retrieve);sonobuoy results $results1
+                       pwd
+                       mkdir -p results1
+                       echo $results1
                        ls -la 
-                       tar -xvzf $results
+                       tar -xvzf $results1 -C results1
+                       ls -la
+                     '''
+                     sh '''
+                       sonobuoy delete --wait
+                       sonobuoy run --e2e-focus "Pods should be submitted and removed" --wait
+                       sonobuoy status
+                       results2=$(sonobuoy retrieve);sonobuoy results $results2
+                       pwd
+                       mkdir -p results2
+                       echo $results2
+                       ls -la 
+                       tar -xvzf $results2 -C results2
+                       ls -la
                      '''
                    }
                    post {
                        always {
-                           junit '**/plugins/e2e/results/**/*.xml'
+                           junit 'results**/plugins/e2e/results/**/*.xml'
                        }
                    }
                 }
             }
             post { 
                 always { 
-                    cleanWs()
+                    cleanWs cleanWhenAborted: true
+                    cleanWs cleanWhenFailure: true
+                    cleanWs cleanWhenSuccess: true
+                    cleanWs deleteDirs: true
                 }
             }
         }

@@ -1,0 +1,26 @@
+pipeline {
+   agent any
+   environment {
+       GOCACHE = "/tmp"
+   }
+   stages {
+       stage('Build') {
+           steps {
+               // Create our project directory.
+               git changelog: false, poll: false, url: 'https://github.com/gruntwork-io/terratest-helm-testing-example.git'
+               sh 'cd test'
+               sh 'pwd'
+               sh 'ls -la'
+               sh 'echo $PATH'
+           }
+       }
+       stage('Test') {
+           steps {
+               sh 'cd test'
+               sh 'go clean -cache'
+               // Run Unit Tests.
+               sh 'cd test; pwd; go test minimal_pod_integration_test.go -v -short'
+           }
+       }
+   }
+}
